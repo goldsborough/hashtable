@@ -51,7 +51,7 @@ int ht_copy(HashTable* first, HashTable* second) {
 	first->size = second->size;
 
 	for (size_t chain = 0; chain < second->capacity; ++chain) {
-		for (Node* node = second->nodes[chain]; node; node = node->next) {
+		for (HTNode* node = second->nodes[chain]; node; node = node->next) {
 			if (_ht_push_front(first, chain, node->key, node->value) == HT_ERROR) {
 				return HT_ERROR;
 			}
@@ -92,8 +92,8 @@ int ht_swap(HashTable* first, HashTable* second) {
 }
 
 int ht_destroy(HashTable* table) {
-	Node* node;
-	Node* next;
+	HTNode* node;
+	HTNode* next;
 
 	assert(ht_is_initialized(table));
 	if (!ht_is_initialized(table)) return HT_ERROR;
@@ -126,7 +126,7 @@ int ht_insert(HashTable* table, void* key, void* value) {
 	}
 
 	index = _ht_hash(table, key);
-	for (Node* node = table->nodes[index]; node; node = node->next) {
+	for (HTNode* node = table->nodes[index]; node; node = node->next) {
 		if (_ht_equal(table, key, node->key)) {
 			memcpy(node->value, value, table->value_size);
 			return HT_UPDATED;
@@ -152,7 +152,7 @@ int ht_contains(HashTable* table, void* key) {
 	if (key == NULL) return HT_ERROR;
 
 	index = _ht_hash(table, key);
-	for (Node* node = table->nodes[index]; node; node = node->next) {
+	for (HTNode* node = table->nodes[index]; node; node = node->next) {
 		if (_ht_equal(table, key, node->key)) {
 			return HT_FOUND;
 		}
@@ -162,7 +162,7 @@ int ht_contains(HashTable* table, void* key) {
 }
 
 void* ht_lookup(HashTable* table, void* key) {
-	Node* node;
+	HTNode* node;
 	size_t index;
 
 	assert(table != NULL);
@@ -182,8 +182,8 @@ void* ht_lookup(HashTable* table, void* key) {
 }
 
 int ht_erase(HashTable* table, void* key) {
-	Node* node;
-	Node* previous;
+	HTNode* node;
+	HTNode* previous;
 	size_t index;
 
 	assert(table != NULL);
@@ -312,8 +312,9 @@ bool _ht_should_shrink(HashTable* table) {
 	return table->size == table->capacity * HT_SHRINK_THRESHOLD;
 }
 
-Node* _ht_create_node(HashTable* table, void* key, void* value, Node* next) {
-	Node* node;
+HTNode*
+_ht_create_node(HashTable* table, void* key, void* value, HTNode* next) {
+	HTNode* node;
 
 	assert(table != NULL);
 	assert(key != NULL);
@@ -341,7 +342,7 @@ int _ht_push_front(HashTable* table, size_t index, void* key, void* value) {
 	return table->nodes[index] == NULL ? HT_ERROR : HT_SUCCESS;
 }
 
-void _ht_destroy_node(Node* node) {
+void _ht_destroy_node(HTNode* node) {
 	assert(node != NULL);
 
 	free(node->key);
@@ -354,10 +355,10 @@ int _ht_adjust_capacity(HashTable* table) {
 }
 
 int _ht_allocate(HashTable* table, size_t capacity) {
-	if ((table->nodes = malloc(capacity * sizeof(Node*))) == NULL) {
+	if ((table->nodes = malloc(capacity * sizeof(HTNode*))) == NULL) {
 		return HT_ERROR;
 	}
-	memset(table->nodes, 0, capacity * sizeof(Node*));
+	memset(table->nodes, 0, capacity * sizeof(HTNode*));
 
 	table->capacity = capacity;
 	table->threshold = capacity * HT_LOAD_FACTOR;
@@ -366,7 +367,7 @@ int _ht_allocate(HashTable* table, size_t capacity) {
 }
 
 int _ht_resize(HashTable* table, size_t new_capacity) {
-	Node** old;
+	HTNode** old;
 	size_t old_capacity;
 
 	if (new_capacity < HT_MINIMUM_CAPACITY) {
@@ -391,9 +392,9 @@ int _ht_resize(HashTable* table, size_t new_capacity) {
 	return HT_SUCCESS;
 }
 
-void _ht_rehash(HashTable* table, Node** old, size_t old_capacity) {
-	Node* node;
-	Node* next;
+void _ht_rehash(HashTable* table, HTNode** old, size_t old_capacity) {
+	HTNode* node;
+	HTNode* next;
 	size_t new_index;
 
 	for (int i = 0; i < old_capacity; ++i) {

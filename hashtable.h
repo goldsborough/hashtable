@@ -20,7 +20,7 @@
 #define HT_INSERTED 0
 
 #define HT_NOT_FOUND 0
-#define HT_FOUND 1
+#define HT_FOUND 01
 
 #define HT_INITIALIZER {0, 0, 0, 0, 0, NULL, NULL, NULL};
 
@@ -29,12 +29,12 @@ typedef size_t (*hash_t)(void*, size_t);
 
 /****************** STRUCTURES ******************/
 
-typedef struct Node {
-	struct Node* next;
+typedef struct HTNode {
+	struct HTNode* next;
 	void* key;
 	void* value;
 
-} Node;
+} HTNode;
 
 typedef struct HashTable {
 	size_t size;
@@ -47,7 +47,7 @@ typedef struct HashTable {
 	comparison_t compare;
 	hash_t hash;
 
-	Node** nodes;
+	HTNode** nodes;
 
 } HashTable;
 
@@ -95,13 +95,13 @@ bool _ht_equal(HashTable* table, void* first_key, void* second_key);
 bool _ht_should_grow(HashTable* table);
 bool _ht_should_shrink(HashTable* table);
 
-Node* _ht_create_node(HashTable* table, void* key, void* value, Node* next);
+HTNode* _ht_create_node(HashTable* table, void* key, void* value, HTNode* next);
 int _ht_push_front(HashTable* table, size_t index, void* key, void* value);
-void _ht_destroy_node(Node* node);
+void _ht_destroy_node(HTNode* node);
 
 int _ht_adjust_capacity(HashTable* table);
 int _ht_allocate(HashTable* table, size_t capacity);
 int _ht_resize(HashTable* table, size_t new_capacity);
-void _ht_rehash(HashTable* table, Node** old, size_t old_capacity);
+void _ht_rehash(HashTable* table, HTNode** old, size_t old_capacity);
 
 #endif /* HASHTABLE_H */
