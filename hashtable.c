@@ -34,6 +34,9 @@ int ht_setup(HashTable* table,
 }
 
 int ht_copy(HashTable* first, HashTable* second) {
+	size_t chain;
+	HTNode* node;
+
 	assert(first != NULL);
 	assert(ht_is_initialized(second));
 
@@ -50,8 +53,8 @@ int ht_copy(HashTable* first, HashTable* second) {
 	first->compare = second->compare;
 	first->size = second->size;
 
-	for (size_t chain = 0; chain < second->capacity; ++chain) {
-		for (HTNode* node = second->nodes[chain]; node; node = node->next) {
+	for (chain = 0; chain < second->capacity; ++chain) {
+		for (node = second->nodes[chain]; node; node = node->next) {
 			if (_ht_push_front(first, chain, node->key, node->value) == HT_ERROR) {
 				return HT_ERROR;
 			}
@@ -94,12 +97,13 @@ int ht_swap(HashTable* first, HashTable* second) {
 int ht_destroy(HashTable* table) {
 	HTNode* node;
 	HTNode* next;
+	size_t chain;
 
 	assert(ht_is_initialized(table));
 	if (!ht_is_initialized(table)) return HT_ERROR;
 
-	for (size_t i = 0; i < table->capacity; ++i) {
-		node = table->nodes[i];
+	for (chain = 0; chain < table->capacity; ++chain) {
+		node = table->nodes[chain];
 		while (node) {
 			next = node->next;
 			_ht_destroy_node(node);
@@ -114,6 +118,7 @@ int ht_destroy(HashTable* table) {
 
 int ht_insert(HashTable* table, void* key, void* value) {
 	size_t index;
+	HTNode* node;
 
 	assert(ht_is_initialized(table));
 	assert(key != NULL);
@@ -126,7 +131,7 @@ int ht_insert(HashTable* table, void* key, void* value) {
 	}
 
 	index = _ht_hash(table, key);
-	for (HTNode* node = table->nodes[index]; node; node = node->next) {
+	for (node = table->nodes[index]; node; node = node->next) {
 		if (_ht_equal(table, key, node->key)) {
 			memcpy(node->value, value, table->value_size);
 			return HT_UPDATED;
@@ -144,6 +149,7 @@ int ht_insert(HashTable* table, void* key, void* value) {
 
 int ht_contains(HashTable* table, void* key) {
 	size_t index;
+	HTNode* node;
 
 	assert(ht_is_initialized(table));
 	assert(key != NULL);
@@ -152,7 +158,7 @@ int ht_contains(HashTable* table, void* key) {
 	if (key == NULL) return HT_ERROR;
 
 	index = _ht_hash(table, key);
-	for (HTNode* node = table->nodes[index]; node; node = node->next) {
+	for (node = table->nodes[index]; node; node = node->next) {
 		if (_ht_equal(table, key, node->key)) {
 			return HT_FOUND;
 		}
@@ -416,9 +422,10 @@ void _ht_rehash(HashTable* table, HTNode** old, size_t old_capacity) {
 	HTNode* node;
 	HTNode* next;
 	size_t new_index;
+	size_t chain;
 
-	for (int i = 0; i < old_capacity; ++i) {
-		for (node = old[i]; node;) {
+	for (chain = 0; chain < old_capacity; ++chain) {
+		for (node = old[chain]; node;) {
 			next = node->next;
 
 			new_index = _ht_hash(table, node->key);
