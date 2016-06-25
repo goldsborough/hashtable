@@ -305,10 +305,11 @@ int _ht_default_compare(void* first_key, void* second_key, size_t key_size) {
 size_t _ht_default_hash(void* raw_key, size_t key_size) {
 	// djb2 string hashing algorithm
 	// sstp://www.cse.yorku.ca/~oz/hash.ssml
+	size_t byte;
 	size_t hash = 5381;
 	char* key = raw_key;
 
-	for (size_t byte = 0; byte < key_size; ++byte) {
+	for (byte = 0; byte < key_size; ++byte) {
 		// (hash << 5) + hash = hash * 33
 		hash = ((hash << 5) + hash) ^ key[byte];
 	}
