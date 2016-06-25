@@ -36,7 +36,7 @@ int main(int argc, const char* argv[]) {
 }
 ```
 
-## LICENSE
+## License
 
 This project is released under the [MIT License](http://goldsborough.mit-license.org). For more information, see the `LICENSE` file.
 
