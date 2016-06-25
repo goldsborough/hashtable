@@ -181,6 +181,26 @@ void* ht_lookup(HashTable* table, void* key) {
 	return NULL;
 }
 
+const void* ht_const_lookup(const HashTable* table, void* key) {
+	const HTNode* node;
+	size_t index;
+
+	assert(table != NULL);
+	assert(key != NULL);
+
+	if (table == NULL) return NULL;
+	if (key == NULL) return NULL;
+
+	index = _ht_hash(table, key);
+	for (node = table->nodes[index]; node; node = node->next) {
+		if (_ht_equal(table, key, node->key)) {
+			return node->value;
+		}
+	}
+
+	return NULL;
+}
+
 int ht_erase(HashTable* table, void* key) {
 	HTNode* node;
 	HTNode* previous;
@@ -290,7 +310,7 @@ size_t _ht_default_hash(void* raw_key, size_t key_size) {
 	return hash;
 }
 
-size_t _ht_hash(HashTable* table, void* key) {
+size_t _ht_hash(const HashTable* table, void* key) {
 #ifdef HT_USING_POWER_OF_TWO
 	return table->hash(key, table->key_size) & table->capacity;
 #else
@@ -298,7 +318,7 @@ size_t _ht_hash(HashTable* table, void* key) {
 #endif
 }
 
-bool _ht_equal(HashTable* table, void* first_key, void* second_key) {
+bool _ht_equal(const HashTable* table, void* first_key, void* second_key) {
 	return table->compare(first_key, second_key, table->key_size) == 0;
 }
 

@@ -70,6 +70,8 @@ int ht_insert(HashTable* table, void* key, void* value);
 
 int ht_contains(HashTable* table, void* key);
 void* ht_lookup(HashTable* table, void* key);
+const void* ht_const_lookup(const HashTable* table, void* key);
+
 #define HT_LOOKUP_AS(type, table_pointer, key_pointer) \
 	(*(type*)ht_lookup((table_pointer), (key_pointer)))
 
@@ -89,8 +91,8 @@ void _ht_pointer_swap(void** first, void** second);
 size_t _ht_default_hash(void* key, size_t key_size);
 int _ht_default_compare(void* first_key, void* second_key, size_t key_size);
 
-size_t _ht_hash(HashTable* table, void* key);
-bool _ht_equal(HashTable* table, void* first_key, void* second_key);
+size_t _ht_hash(const HashTable* table, void* key);
+bool _ht_equal(const HashTable* table, void* first_key, void* second_key);
 
 bool _ht_should_grow(HashTable* table);
 bool _ht_should_shrink(HashTable* table);
