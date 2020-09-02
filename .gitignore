@@ -1,3 +1,15 @@
+.vs/
+*.suo
+*.user
+x64/
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+
 
 # Created by https://www.gitignore.io/api/cmake,c
 
